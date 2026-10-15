@@ -29,6 +29,11 @@ def theoretical_coverage(true_sd: float) -> float:
     return 2 * STANDARD_NORMAL.cdf(ratio) - 1
 
 
+def monte_carlo_se(coverage: float) -> float:
+    """Estimated standard error of a coverage proportion across datasets."""
+    return math.sqrt(coverage * (1 - coverage) / REPLICATIONS)
+
+
 def simulate(true_sd: float, seed: int) -> tuple[float, float]:
     rng = random.Random(seed)
     posterior_hits = 0
@@ -134,9 +139,12 @@ def main() -> None:
     output_dir = Path(__file__).resolve().parent / "outputs"
     output_dir.mkdir(exist_ok=True)
     print(f"seed={SEED} n={SAMPLE_SIZE} replications={REPLICATIONS} prior_sd={PRIOR_SD}")
-    print("true_sd,posterior_coverage,theoretical_coverage,sandwich_coverage")
+    print(
+        "true_sd,posterior_coverage,theoretical_coverage,sandwich_coverage,"
+        "posterior_mc_se,sandwich_mc_se"
+    )
     results: list[tuple[float, float, float]] = []
-    rows: list[tuple[str, str, str, str]] = []
+    rows: list[tuple[str, str, str, str, str, str]] = []
     for index, true_sd in enumerate(TRUE_SDS):
         posterior, sandwich = simulate(true_sd, SEED + index)
         results.append((true_sd, posterior, sandwich))
@@ -145,13 +153,22 @@ def main() -> None:
             f"{posterior:.5f}",
             f"{theoretical_coverage(true_sd):.5f}",
             f"{sandwich:.5f}",
+            f"{monte_carlo_se(posterior):.5f}",
+            f"{monte_carlo_se(sandwich):.5f}",
         )
         rows.append(row)
         print(",".join(row))
     with (output_dir / "results.csv").open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file, lineterminator="\n")
         writer.writerow(
-            ("true_sd", "posterior_coverage", "theoretical_coverage", "sandwich_coverage")
+            (
+                "true_sd",
+                "posterior_coverage",
+                "theoretical_coverage",
+                "sandwich_coverage",
+                "posterior_mc_se",
+                "sandwich_mc_se",
+            )
         )
         writer.writerows(rows)
     write_figure(results, output_dir / "coverage.svg")
