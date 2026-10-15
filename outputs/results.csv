@@ -1,5 +1,5 @@
-true_sd,posterior_coverage,theoretical_coverage,sandwich_coverage
-0.5,0.99994,0.99991,0.94704
-1.0,0.94944,0.95001,0.94700
-1.5,0.80676,0.80869,0.94636
-2.0,0.67340,0.67293,0.94798
+true_sd,posterior_coverage,theoretical_coverage,sandwich_coverage,posterior_mc_se,sandwich_mc_se
+0.5,0.99994,0.99991,0.94704,0.00003,0.00100
+1.0,0.94944,0.95001,0.94700,0.00098,0.00100
+1.5,0.80676,0.80869,0.94636,0.00177,0.00101
+2.0,0.67340,0.67293,0.94798,0.00210,0.00099
